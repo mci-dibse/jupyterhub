@@ -57,6 +57,7 @@ class HomeHandler(BaseHandler):
         html = self.render_template('home.html',
             user=user,
             url=url,
+            course=self.course
         )
         self.finish(html)
 

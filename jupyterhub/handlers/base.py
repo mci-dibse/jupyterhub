@@ -13,6 +13,7 @@ import re
 import time
 from urllib.parse import urlparse, urlunparse, parse_qs, urlencode
 import uuid
+import logging
 
 from jinja2 import TemplateNotFound
 
@@ -32,6 +33,14 @@ from ..metrics import (
     SERVER_SPAWN_DURATION_SECONDS, ServerSpawnStatus,
     PROXY_ADD_DURATION_SECONDS, ProxyAddStatus,
 )
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+f_handler = logging.FileHandler('jupyterhub_user.log')
+f_handler.setLevel(logging.DEBUG)
+f_format = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+f_handler.setFormatter(f_format)
+logger.addHandler(f_handler)
 
 # pattern for the authentication token header
 auth_header_pat = re.compile(r'^(?:token|bearer)\s+([^\s]+)$', flags=re.IGNORECASE)
@@ -182,6 +191,10 @@ class BaseHandler(RequestHandler):
     @property
     def redirect_to_server(self):
         return self.settings.get('redirect_to_server', True)
+
+    @property
+    def course(self):
+        return self.settings.get('course', None)
 
     def get_auth_token(self):
         """Get the authorization token from Authorization header"""
@@ -354,12 +367,11 @@ class BaseHandler(RequestHandler):
         else:
             set_cookie = self.set_cookie
 
-        self.log.debug("Setting cookie %s: %s", key, kwargs)
+        logger.info("Setting cookie %s: %s", key, kwargs)
         set_cookie(key, value, **kwargs)
 
 
     def _set_user_cookie(self, user, server):
-        self.log.debug("Setting cookie for %s: %s", user.name, server.cookie_name)
         self._set_cookie(
             server.cookie_name,
             user.cookie_id,
@@ -397,6 +409,15 @@ class BaseHandler(RequestHandler):
         """set the login cookie for the Hub"""
         self._set_user_cookie(user, self.hub)
 
+    def set_course_cookie(self):
+        key = 'jupyterhub-course'
+        value = self.course.replace(' ','_')
+        self._set_cookie(
+            'jupyterhub-course',
+            value,
+            encrypted=False,
+        )
+
     def set_login_cookie(self, user):
         """Set login cookies for the Hub and single-user server."""
         if self.subdomain_host and not self.request.host.startswith(self.domain):
@@ -414,6 +435,8 @@ class BaseHandler(RequestHandler):
         # create and set a new cookie token for the hub
         if not self.get_current_user_cookie():
             self.set_hub_cookie(user)
+
+        self.set_course_cookie()
 
     def authenticate(self, data):
         return maybe_future(self.authenticator.get_authenticated_user(self, data))
@@ -600,14 +623,14 @@ class BaseHandler(RequestHandler):
 
         tic = IOLoop.current().time()
 
-        self.log.debug("Initiating spawn for %s", user_server_name)
+        logger.info("Initiating spawn for %s", user_server_name)
 
         spawn_future = user.spawn(server_name, options, handler=self)
 
-        self.log.debug("%i%s concurrent spawns",
+        logger.info("%i%s concurrent spawns",
             spawn_pending_count,
             '/%i' % concurrent_spawn_limit if concurrent_spawn_limit else '')
-        self.log.debug("%i%s active servers",
+        logger.info("%i%s active servers",
             active_count,
             '/%i' % active_server_limit if active_server_limit else '')
 
@@ -625,7 +648,7 @@ class BaseHandler(RequestHandler):
             # wait for spawn Future
             await spawn_future
             toc = IOLoop.current().time()
-            self.log.info("User %s took %.3f seconds to start", user_server_name, toc-tic)
+            logger.info("User %s took %.3f seconds to start", user_server_name, toc-tic)
             self.statsd.timing('spawner.success', (toc - tic) * 1000)
             SERVER_SPAWN_DURATION_SECONDS.labels(
                 status=ServerSpawnStatus.success
@@ -641,8 +664,8 @@ class BaseHandler(RequestHandler):
                     time.perf_counter() - proxy_add_start_time
                 )
             except Exception:
-                self.log.exception("Failed to add %s to proxy!", user_server_name)
-                self.log.error("Stopping %s to avoid inconsistent state", user_server_name)
+                logger.exception("Failed to add %s to proxy!", user_server_name)
+                logger.error("Stopping %s to avoid inconsistent state", user_server_name)
                 await user.stop()
                 PROXY_ADD_DURATION_SECONDS.labels(
                     status='failure'

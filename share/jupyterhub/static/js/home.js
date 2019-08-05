@@ -17,12 +17,13 @@ require(["jquery", "jhapi"], function($, JHAPI) {
       });
     api.stop_server(user, {
       success: function() {
-        $("#start")
-          .text("Start My Server")
-          .attr("title", "Start your server")
-          .attr("disabled", false)
-          .off("click");
-        $("#stop").hide();
+        location.reload();
+//        $("#start")
+//          .text(getCookie('jupyterhub-course'))
+//          .attr("title", "Start your server")
+//          .attr("disabled", false)
+//          .off("click");
+//        $("#stop").hide();
       }
     });
   });
