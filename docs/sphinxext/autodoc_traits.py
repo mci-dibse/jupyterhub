@@ -1,8 +1,9 @@
 """autodoc extension for configurable traits"""
-
-from traitlets import TraitType, Undefined
 from sphinx.domains.python import PyClassmember
-from sphinx.ext.autodoc import ClassDocumenter, AttributeDocumenter
+from sphinx.ext.autodoc import AttributeDocumenter
+from sphinx.ext.autodoc import ClassDocumenter
+from traitlets import TraitType
+from traitlets import Undefined
 
 
 class ConfigurableDocumenter(ClassDocumenter):
@@ -37,17 +38,18 @@ class TraitDocumenter(AttributeDocumenter):
     def can_document_member(cls, member, membername, isattr, parent):
         return isinstance(member, TraitType)
 
-    def format_name(self):
-        return 'config c.' + super().format_name()
-
     def add_directive_header(self, sig):
         default = self.object.get_default_value()
         if default is Undefined:
             default_s = ''
         else:
             default_s = repr(default)
-        sig = ' = {}({})'.format(self.object.__class__.__name__, default_s)
-        return super().add_directive_header(sig)
+        self.options.annotation = 'c.{name} = {trait}({default})'.format(
+            name=self.format_name(),
+            trait=self.object.__class__.__name__,
+            default=default_s,
+        )
+        super().add_directive_header(sig)
 
 
 def setup(app):

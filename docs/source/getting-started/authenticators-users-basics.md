@@ -31,6 +31,15 @@ c.Authenticator.admin_users = {'mal', 'zoe'}
 Users in the admin list are automatically added to the user `whitelist`,
 if they are not already present.
 
+Each authenticator may have different ways of determining whether a user is an
+administrator. By default JupyterHub use the PAMAuthenticator which provide the
+`admin_groups` option and can determine administrator status base on a user
+groups. For example we can let any users in the `wheel` group be admin:
+
+```python
+c.PAMAuthenticator.admin_groups = {'wheel'}
+```
+
 ## Give admin access to other users' notebook servers (`admin_access`)
 
 Since the default `JupyterHub.admin_access` setting is False, the admins
@@ -94,6 +103,17 @@ popular services:
 
 A generic implementation, which you can use for OAuth authentication
 with any provider, is also available.
+
+## Use DummyAuthenticator for testing
+
+The :class:`~jupyterhub.auth.DummyAuthenticator` is a simple authenticator that
+allows for any username/password unless if a global password has been set. If
+set, it will allow for any username as long as the correct password is provided.
+To set a global password, add this to the config file:
+
+```python
+c.DummyAuthenticator.password = "some_password"
+```
 
 [PAM]: https://en.wikipedia.org/wiki/Pluggable_authentication_module
 [OAuthenticator]: https://github.com/jupyterhub/oauthenticator

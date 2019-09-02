@@ -5,14 +5,15 @@ Technical Reference
    :maxdepth: 2
 
    technical-overview
+   urls
    websecurity
    authenticators
    spawners
    services
    proxy
+   separate-proxy
    rest
    database
-   upgrading
    templates
    config-user-env
    config-examples

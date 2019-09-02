@@ -3,8 +3,13 @@ Traitlets that are used in JupyterHub
 """
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-
-from traitlets import List, Unicode, Integer, TraitType, TraitError
+import entrypoints
+from traitlets import Integer
+from traitlets import List
+from traitlets import TraitError
+from traitlets import TraitType
+from traitlets import Type
+from traitlets import Unicode
 
 
 class URLPrefix(Unicode):
@@ -21,6 +26,7 @@ class Command(List):
     """Traitlet for a command that should be a list of strings,
     but allows it to be specified as a single string.
     """
+
     def __init__(self, default_value=None, **kwargs):
         kwargs.setdefault('minlen', 1)
         if isinstance(default_value, str):
@@ -68,10 +74,18 @@ class ByteSpecification(Integer):
         try:
             num = float(value[:-1])
         except ValueError:
-            raise TraitError('{val} is not a valid memory specification. Must be an int or a string with suffix K, M, G, T'.format(val=value))
+            raise TraitError(
+                '{val} is not a valid memory specification. Must be an int or a string with suffix K, M, G, T'.format(
+                    val=value
+                )
+            )
         suffix = value[-1]
         if suffix not in self.UNIT_SUFFIXES:
-            raise TraitError('{val} is not a valid memory specification. Must be an int or a string with suffix K, M, G, T'.format(val=value))
+            raise TraitError(
+                '{val} is not a valid memory specification. Must be an int or a string with suffix K, M, G, T'.format(
+                    val=value
+                )
+            )
         else:
             return int(float(num) * self.UNIT_SUFFIXES[suffix])
 
@@ -88,6 +102,53 @@ class Callable(TraitType):
 
     def validate(self, obj, value):
         if callable(value):
-           return value
+            return value
         else:
             self.error(obj, value)
+
+
+class EntryPointType(Type):
+    """Entry point-extended Type
+
+    classes can be registered via entry points
+    in addition to standard 'mypackage.MyClass' strings
+    """
+
+    _original_help = ''
+
+    def __init__(self, *args, entry_point_group, **kwargs):
+        self.entry_point_group = entry_point_group
+        super().__init__(*args, **kwargs)
+
+    @property
+    def help(self):
+        """Extend help by listing currently installed choices"""
+        chunks = [self._original_help]
+        chunks.append("Currently installed: ")
+        for key, entry_point in self.load_entry_points().items():
+            chunks.append(
+                "  - {}: {}.{}".format(
+                    key, entry_point.module_name, entry_point.object_name
+                )
+            )
+        return '\n'.join(chunks)
+
+    @help.setter
+    def help(self, value):
+        self._original_help = value
+
+    def load_entry_points(self):
+        """Load my entry point group"""
+        # load the group
+        group = entrypoints.get_group_named(self.entry_point_group)
+        # make it case-insensitive
+        return {key.lower(): value for key, value in group.items()}
+
+    def validate(self, obj, value):
+        if isinstance(value, str):
+            # first, look up in entry point registry
+            registry = self.load_entry_points()
+            key = value.lower()
+            if key in registry:
+                value = registry[key].load()
+        return super().validate(obj, value)

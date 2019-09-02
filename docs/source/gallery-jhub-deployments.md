@@ -66,7 +66,7 @@ easy to do with RStudio too.
 
 ### University of Colorado Boulder
 
-- (CU Research Computing) CURC 
+- (CU Research Computing) CURC
     - [JupyterHub User Guide](https://www.rc.colorado.edu/support/user-guide/jupyterhub.html)
         - Slurm job dispatched on Crestone compute cluster
         - log troubleshooting
@@ -77,16 +77,25 @@ easy to do with RStudio too.
 - Earth Lab at CU
     - [Tutorial on Parallel R on JupyterHub](https://earthdatascience.org/tutorials/parallel-r-on-jupyterhub/)
 
+### George Washington University
+
+- [Jupyter Hub](http://go.gwu.edu/jupyter) with university single-sign-on. Deployed early 2017.
+
 ### HTCondor
 
 - [HTCondor Python Bindings Tutorial from HTCondor Week 2017 includes information on their JupyterHub tutorials](https://research.cs.wisc.edu/htcondor/HTCondorWeek2017/presentations/TueBockelman_Python.pdf)
 
 ### University of Illinois
 
-- https://datascience.business.illinois.edu
+- https://datascience.business.illinois.edu (currently down; checked 04/26/19)
+
+### IllustrisTNG Simulation Project
+
+- [JupyterHub/Lab-based analysis platform, part of the TNG public data release](http://www.tng-project.org/data/)
 
 ### MIT and Lincoln Labs
 
+- https://supercloud.mit.edu/
 
 ### Michigan State University
 
@@ -100,7 +109,16 @@ easy to do with RStudio too.
 
 - https://dsa.missouri.edu/faq/
 
-### University of Rochester CIRC 
+### Paderborn University
+
+- [Data Science (DICE) group](https://dice.cs.uni-paderborn.de/)
+    - [nbgraderutils](https://github.com/dice-group/nbgraderutils): Use JupyterHub + nbgrader + iJava kernel for online Java exercises. Used in lecture Statistical Natural Language Processing.
+
+### Penn State University
+
+- [Press release](https://news.psu.edu/story/523093/2018/05/24/new-open-source-web-apps-available-students-and-faculty): "New open-source web apps available for students and faculty" (but Hub is currently down; checked 04/26/19)
+
+### University of Rochester CIRC
 
 - [JupyterHub Userguide](https://info.circ.rochester.edu/Web_Applications/JupyterHub.html) - Slurm, beehive
 
@@ -116,7 +134,7 @@ easy to do with RStudio too.
 
 - Educational Technology Services - Paul Jamason
     - [jupyterhub.ucsd.edu](https://jupyterhub.ucsd.edu)
-    
+
 ### TACC University of Texas
 
 ### Texas A&M
@@ -141,7 +159,6 @@ easy to do with RStudio too.
 
 [Everware](https://github.com/everware) Reproducible and reusable science powered by jupyterhub and docker. Like nbviewer, but executable. CERN, Geneva [website](http://everware.xyz/)
 
-
 ### Microsoft Azure
 
 - https://docs.microsoft.com/en-us/azure/machine-learning/machine-learning-data-science-linux-dsvm-intro
@@ -151,9 +168,11 @@ easy to do with RStudio too.
 - https://getcarina.com/blog/learning-how-to-whale/
 - http://carolynvanslyck.com/talk/carina/jupyterhub/#/
 
-### jcloud.io
-- Open to public JupyterHub server
-    - https://jcloud.io
+### Hadoop
+
+- [Deploying JupyterHub on Hadoop](https://jcrist.github.io/jupyterhub-on-hadoop/)
+
+
 ## Miscellaneous
 
 - https://medium.com/@ybarraud/setting-up-jupyterhub-with-sudospawner-and-anaconda-844628c0dbee#.rm3yt87e1

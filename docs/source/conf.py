@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import sys
 import os
 import shlex
-
-# For conversion from markdown to html
-import recommonmark.parser
+import sys
 
 # Set paths
 sys.path.insert(0, os.path.abspath('.'))
@@ -21,6 +18,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.napoleon',
     'autodoc_traits',
+    'sphinx_copybutton',
 ]
 
 templates_path = ['_templates']
@@ -58,6 +56,16 @@ default_role = 'literal'
 
 # -- Source -------------------------------------------------------------
 
+import recommonmark
+from recommonmark.transform import AutoStructify
+
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {'enable_eval_rst': True}, True)
+    app.add_stylesheet('custom.css')
+    app.add_transform(AutoStructify)
+
+
 source_parsers = {'.md': 'recommonmark.parser.CommonMarkParser'}
 
 source_suffix = ['.rst', '.md']
@@ -66,7 +74,10 @@ source_suffix = ['.rst', '.md']
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.
-html_theme = 'alabaster'
+import alabaster_jupyterhub
+
+html_theme = 'alabaster_jupyterhub'
+html_theme_path = [alabaster_jupyterhub.get_html_theme_path()]
 
 html_logo = '_static/images/logo/logo.png'
 html_favicon = '_static/images/logo/favicon.ico'
