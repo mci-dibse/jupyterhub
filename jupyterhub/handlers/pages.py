@@ -65,11 +65,30 @@ class HomeHandler(BaseHandler):
         else:
             url = url_path_join(self.hub.base_url, 'spawn', user.name)
 
+        try:
+            # Get course names
+            container_course = user.spawner.get_env()['COURSE']
+            lti_course = self.course
+
+            # Shorten course names
+            try:
+                container_course = container_course[:self.course.rindex(' ')]
+            except:
+                pass
+            try:
+                lti_course = lti_course[:self.course.rindex(' ')]
+            except:
+                pass
+        except:
+            container_course = "None"
+            lti_course = "None"
+
         html = self.render_template(
             'home.html',
             user=user,
             url=url,
-            course=self.course,
+            lti_course=lti_course,
+            container_course=container_course,
             allow_named_servers=self.allow_named_servers,
             named_server_limit_per_user=self.named_server_limit_per_user,
             url_path_join=url_path_join,

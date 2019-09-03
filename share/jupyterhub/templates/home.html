@@ -60,21 +60,21 @@
   <div class="row">
     <div class="text-center">
       {% if user.running %}
-      <a id="stop" role="button" class="btn btn-lg btn-danger">Stop {{user.spawner.get_env()['COURSE'][:user.spawner.get_env()['COURSE'].rindex(' ')]}}</a>
+      <a id="stop" role="button" class="btn btn-lg btn-danger">Stop {{ container_course }}</a>
       {% endif %}
       <a id="start" role="button" class="btn btn-lg btn-primary" href="{{ url }}">
       {% if not user.active %}
-      Start {{course[:course.rindex(' ')]}}
+      Start {{ container_course }}
       {% endif %}
       {% if user.active %}
-      {{user.spawner.get_env()['COURSE'][:user.spawner.get_env()['COURSE'].rindex(' ')]}}
+      {{ container_course }}
       {% endif %}
       </a>
     </div>
     <br/>
     <div id="coursemsg">
-      {% if user.active and course != user.spawner.get_env()['COURSE'] %}
-        Sie müssen den aktiven Kurs '{{user.spawner.get_env()['COURSE'][:user.spawner.get_env()['COURSE'].rindex(' ')]}}' stoppen, um den Kurs '{{course[:course.rindex(' ')]}}' starten zu können.
+      {% if user.active and container_course != lti_course %}
+        Sie müssen den aktiven Kurs '{{ container_course }}' stoppen, um den Kurs '{{ lti_course }}' starten zu können.
       {% endif %}
     </div>
   </div>

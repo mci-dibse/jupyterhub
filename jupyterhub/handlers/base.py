@@ -226,7 +226,7 @@ class BaseHandler(RequestHandler):
 
     @property
     def course(self):
-        return self.settings.get('course', None)
+        return self.settings.get('course', "NONE")
 
     @property
     def authenticate_prometheus(self):
@@ -480,7 +480,7 @@ class BaseHandler(RequestHandler):
         else:
             set_cookie = self.set_cookie
 
-        logger.info("Setting cookie %s: %s", key, kwargs)
+        self.log.debug("Setting cookie %s: %s", key, kwargs)
         set_cookie(key, value, **kwargs)
 
     def _set_user_cookie(self, user, server):
@@ -525,7 +525,7 @@ class BaseHandler(RequestHandler):
         key = 'jupyterhub-course'
         value = self.course.replace(' ','_')
         self._set_cookie(
-            'jupyterhub-course',
+            key,
             value,
             encrypted=False,
         )
@@ -792,7 +792,7 @@ class BaseHandler(RequestHandler):
 
         tic = IOLoop.current().time()
 
-        logger.info("Initiating spawn for %s", user_server_name)
+        self.log.debug("Initiating spawn for %s", user_server_name)
 
         spawn_future = user.spawn(server_name, options, handler=self)
 
