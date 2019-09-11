@@ -64,7 +64,7 @@
       {% endif %}
       <a id="start" role="button" class="btn btn-lg btn-primary" href="{{ url }}">
       {% if not user.active %}
-      Start {{ container_course }}
+      Start {{ lti_course }}
       {% endif %}
       {% if user.active %}
       {{ container_course }}

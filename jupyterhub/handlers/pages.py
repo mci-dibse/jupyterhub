@@ -65,23 +65,18 @@ class HomeHandler(BaseHandler):
         else:
             url = url_path_join(self.hub.base_url, 'spawn', user.name)
 
+        # get course from container
         try:
-            # Get course names
             container_course = user.spawner.get_env()['COURSE']
-            lti_course = self.course
-
-            # Shorten course names
-            try:
-                container_course = container_course[:self.course.rindex(' ')]
-            except:
-                pass
-            try:
-                lti_course = lti_course[:self.course.rindex(' ')]
-            except:
-                pass
+            container_course = container_course[:container_course.rindex(' ')]
         except:
-            container_course = "None"
-            lti_course = "None"
+            container_course = 'None'
+        # get course from lti request
+        try:
+            lti_course = self.course
+            lti_course = lti_course[:self.course.rindex(' ')]
+        except:
+            lti_course = 'None'
 
         html = self.render_template(
             'home.html',
@@ -121,6 +116,7 @@ class SpawnHandler(BaseHandler):
 
     @web.authenticated
     async def get(self, for_user=None, server_name=''):
+        print("Spawnhandler.get(" + str(for_user) + ", " + str(server_name) + ")")
         """GET renders form for spawning with user-specified options
 
         or triggers spawn via redirect if there is no form.
@@ -196,6 +192,7 @@ class SpawnHandler(BaseHandler):
 
     @web.authenticated
     async def post(self, for_user=None, server_name=''):
+        print("Spawnhandler.post(" + str(for_user) + ", " + str(server_name) + ")")
         """POST spawns with user-specified options"""
         user = current_user = self.current_user
         if for_user is not None and for_user != user.name:
